@@ -1,0 +1,12 @@
+[theme]
+base = "light"
+# The primary background color for the main content area
+backgroundColor = "#e1f7d3"
+
+# The background color for the sidebar and widgets
+secondaryBackgroundColor = "#1a5c3a"
+
+# Optional: Text and accent colors to ensure high contrast
+textColor = "#084b0d"
+primaryColor = "#6b9463"
+font = "monospace"
