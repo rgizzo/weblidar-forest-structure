@@ -45,6 +45,8 @@ Launch the application
 streamlit run app.py
 ```
 
+![App Demo](./assets/app-demo.gif)
+
 # Data Access 
 
 # Acknowledgements 
