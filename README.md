@@ -1,8 +1,8 @@
-*Background
+# Background
 
-*Repository set-up 
-
-`` weblidar-forest-structure/
+# Repository Structure
+```
+weblidar-forest-structure/
 ├── README.md
 ├── app.py
 ├── assets/
@@ -10,7 +10,7 @@
 ├── requirements.txt      
 ├── data/                 
 ├── notebooks/            
-│   └── analysis.ipynb
+    └── analysis.ipynb
     └── preprocessing.rmd 
 └── figures/              
-``
+```
