@@ -37,7 +37,7 @@ with left:
         dict(
             icon='↟˖˚𖤣𖥧↟˖˚𓋼𖤣𖥧˖˚𓋼𓍊',
             title="Old Growth Deciduous",
-            description="This site is part of Bartlett Experimental Forest in Carroll County, New Hampshire. The area is ideal for old growth deciduous hardwoods consisting of beech (Fagus sp.) and sugar maple (Acer saccarum)."
+            description="This site is part of Bartlett Experimental Forest in Carroll County, New Hampshire. The area is dominated by old growth deciduous hardwoods consisting of beech (Fagus sp.) and sugar maple (Acer saccarum)."
         ),
         dict(
             icon='↟𖠰˚☀︎˖˚ᨒ↟˖˚𖠰',
