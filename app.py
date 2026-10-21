@@ -1,10 +1,12 @@
 import streamlit as st
 import laspy
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
+from streamlit_extras.card_selector import *
 
 st.set_page_config(layout="wide")
-st.title("Seeing the Trees for the Forest: Visualizing Forest Structure with LiDAR")
+st.markdown("<h1 style='font-size: 35px;'>Seeing the Trees for the Forest: Visualizing Forest Structure with LiDAR</h1>", unsafe_allow_html=True)
 st.markdown(
     """
     <style>
@@ -15,7 +17,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-left, center, right = st.columns([1, 3.5, 1.5], gap="medium")
+left, center, right = st.columns([0.85, 3.5, 1.5], gap="medium")
 
 # Map forest types to LAZ files
 forest_files = {
@@ -24,17 +26,39 @@ forest_files = {
     "Longleaf Pine Savanna": "data/OSBS_cropped.laz"
 }
 
+forest_names = list(forest_files.keys())
+
 with left:
-    # Forest selection
-    forest = st.radio(
-        "Select Forest Type",
-        options=list(forest_files.keys()),
-        horizontal=True
+    
+    st.markdown("<label style='font-size: 15px;'>Select Forest Type:</h1>", unsafe_allow_html=True)
+    
+    forest = card_selector(
+    [
+        dict(
+            icon='↟˖˚𖤣𖥧↟˖˚𓋼𖤣𖥧˖˚𓋼𓍊',
+            title="Old Growth Deciduous",
+            description="This site is part of Bartlett Experimental Forest in Carroll County, New Hampshire. The area is ideal for old growth deciduous hardwoods consisting of beech (Fagus sp.) and sugar maple (Acer saccarum)."
+        ),
+        dict(
+            icon='↟𖠰˚☀︎˖˚ᨒ↟˖˚𖠰',
+            title="Mixed Pine Forest",
+            description="Located in Alabama's Talladega National forest, this site is dominated by longleaf pine (Pinus palustris) and loblolly pine (Pinus taeda) with mixed species of oak in the understory."
+        ),
+        dict(
+            icon='˖˚ʚ ⸙₊ ෴⋆.𖥧',
+            title="Longleaf Pine Savanna",
+            description="Dominated by pine and turkey oak (Quercus laevis), this site is located at Ordway Swisher Biological station in Putnam County, Florida. Pines are primarily Longleaf (Pinus palustris) and Loblolly (P.taeda), with a grass and forb groundcover."
+        )
+    ],
+    key = list("forest_selector")
     )
 
     def load_point_cloud(filepath):
         return laspy.read(filepath)
+    if forest is None:
+        forest = 0  # Default to first forest
 
+    forest = forest_names[forest]
     las = load_point_cloud(forest_files[forest])
 
     # Extract coordinates
@@ -61,7 +85,7 @@ with left:
     blue = blue[idx]
 
     color_mode = st.radio(
-        "Point Cloud Coloring",
+        "Select Point Cloud Color:",
         ["RGB", "Classification", "Height"],
         horizontal=False
     )
@@ -172,7 +196,7 @@ with center:
 
         for i, (class_id, name) in enumerate(class_names.items()):
             fig.add_annotation(
-                x=1.02,
+                x=0.85,
                 y=0.95 - i * 0.06,
                 xref="paper",
                 yref="paper",
@@ -215,6 +239,37 @@ rh_values = {
     "RH98": np.percentile(heights, 98)
 }
 
+# Calculate RH metrics for all three forests
+rh_results = []
+
+for forest_name, filepath in forest_files.items():
+
+    site_las = laspy.read(filepath)
+    heights = np.asarray(site_las.z)
+
+    # Filter by selected height range
+    heights = heights[
+        np.isfinite(heights) &
+        (heights >= height_range[0]) &
+        (heights <= height_range[1])
+    ]
+
+    if len(heights) == 0:
+        rh25 = rh50 = rh98 = np.nan
+    else:
+        rh25, rh50, rh98 = np.percentile(
+            heights, [25, 50, 98]
+        )
+
+    rh_results.append({
+        "Forest": forest_name,
+        "RH25 (m)": rh25,
+        "RH50 (m)": rh50,
+        "RH98 (m)": rh98
+    })
+
+rh_df = pd.DataFrame(rh_results)
+
 # Create three pseudo-waveform plots
 transect_figures = []
 
@@ -244,7 +299,7 @@ for metric, rh in rh_values.items():
         title=metric,
         xaxis_title="Return Density",
         yaxis_title="Height (m)",
-        height=200,
+        height=300,
         margin=dict(l=45, r=15, t=35, b=35),
         showlegend=False
     )
@@ -258,5 +313,18 @@ with right:
             use_container_width=True,
             key=f"rh_profile_{i}"
         )
+        
+with center: 
+    st.markdown("<label style='font-size: 15px;'>Forest Structure Comparison</h1>", unsafe_allow_html=True)
+
+    st.dataframe(
+        rh_df.style.format({
+            "RH25 (m)": "{:.2f}",
+            "RH50 (m)": "{:.2f}",
+            "RH98 (m)": "{:.2f}"
+        }),
+        use_container_width=True,
+        hide_index=True
+    )
 
   
